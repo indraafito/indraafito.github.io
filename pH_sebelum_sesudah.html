@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pH Larutan Penyangga — Sebelum & Sesudah</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f5f5f0;
+  color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.page { max-width: 640px; width: 100%; }
+h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 1.5rem; line-height: 1.5; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.btn {
+  padding: 9px 16px; border-radius: 8px;
+  border: 1px solid #ccc; background: #fff;
+  color: #1a1a1a; font-size: 13px; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover { background: #f0f0ea; }
+.btn-acid { border-color: #D85A30; color: #993C1D; }
+.btn-acid:hover { background: #FAECE7; }
+.btn-base { border-color: #185FA5; color: #0C447C; }
+.btn-base:hover { background: #E6F1FB; }
+.btn-dilute { border-color: #3B6D11; color: #27500A; }
+.btn-dilute:hover { background: #EAF3DE; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1rem; }
+.card {
+  background: #fff; border: 1px solid #ddd;
+  border-radius: 12px; overflow: hidden;
+}
+.card-head {
+  padding: 10px 14px; font-size: 13px; font-weight: 500;
+  border-bottom: 1px solid #eee; background: #fafaf8;
+}
+.tbl-head {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  padding: 6px 14px;
+}
+.tbl-head span { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.04em; }
+.tbl-head span:nth-child(2) { text-align: center; }
+.tbl-head span:nth-child(3) { text-align: right; }
+.row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  padding: 10px 14px; border-top: 1px solid #eee;
+  align-items: center;
+}
+.col-label { font-size: 12px; color: #888; }
+.col-val { font-size: 22px; font-weight: 500; text-align: center; }
+.col-delta { font-size: 13px; font-weight: 500; text-align: right; color: #999; }
+.verdict {
+  font-size: 13px; color: #555; line-height: 1.7;
+  padding: 12px 14px; border-radius: 8px;
+  border: 1px solid #ddd; background: #fff;
+  margin-bottom: 1.5rem;
+  min-height: 48px;
+}
+hr { border: none; border-top: 1px solid #e0e0d8; margin: 1.5rem 0; }
+.info {
+  font-size: 12px; color: #666; line-height: 1.7;
+  padding: 12px 14px; border-radius: 8px;
+  border: 1px solid #ddd; background: #fff;
+}
+.info strong { font-weight: 500; color: #1a1a1a; }
+@media (max-width: 420px) {
+  .grid { grid-template-columns: 1fr; }
+  .col-val { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>pH larutan penyangga vs larutan biasa</h1>
+  <p class="subtitle">Pilih aksi di bawah dan amati perubahan pH sebelum dan sesudah — pada kedua jenis larutan.</p>
+
+  <div class="controls">
+    <button class="btn btn-acid" onclick="act('acid')">+ Sedikit asam (HCl)</button>
+    <button class="btn btn-base" onclick="act('base')">+ Sedikit basa (NaOH)</button>
+    <button class="btn btn-dilute" onclick="act('dilute')">+ Pengenceran (H₂O)</button>
+    <button class="btn" onclick="reset()">↺ Reset</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head">Larutan penyangga</div>
+      <div class="tbl-head">
+        <span></span><span>pH</span><span>ΔpH</span>
+      </div>
+      <div class="row">
+        <span class="col-label">Sebelum</span>
+        <span class="col-val" id="buf-before">7.40</span>
+        <span></span>
+      </div>
+      <div class="row">
+        <span class="col-label">Sesudah</span>
+        <span class="col-val" id="buf-after">—</span>
+        <span class="col-delta" id="buf-delta">—</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">Larutan biasa</div>
+      <div class="tbl-head">
+        <span></span><span>pH</span><span>ΔpH</span>
+      </div>
+      <div class="row">
+        <span class="col-label">Sebelum</span>
+        <span class="col-val" id="plain-before">7.00</span>
+        <span></span>
+      </div>
+      <div class="row">
+        <span class="col-label">Sesudah</span>
+        <span class="col-val" id="plain-after">—</span>
+        <span class="col-delta" id="plain-delta">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="verdict" id="verdict">Pilih aksi di atas untuk melihat perubahan pH sebelum dan sesudah.</div>
+
+  <hr>
+
+  <div class="info">
+    <strong>Kesimpulan yang bisa ditarik siswa:</strong> Larutan penyangga memiliki ΔpH yang sangat kecil dibanding larutan biasa setelah penambahan asam, basa, maupun pengenceran. Ini karena terdapat kesetimbangan asam lemah–basa konjugat yang menetralisasi gangguan sebelum pH berubah nyata.
+  </div>
+</div>
+
+<script>
+let bufNow = 7.40, plainNow = 7.00;
+
+function act(type) {
+  var bufBefore = bufNow, plainBefore = plainNow;
+  var bd, pd;
+  if (type === 'acid') {
+    bd = -(0.03 + Math.random() * 0.02);
+    pd = -(1.0 + Math.random() * 0.8);
+  } else if (type === 'base') {
+    bd = (0.03 + Math.random() * 0.02);
+    pd = (1.0 + Math.random() * 0.8);
+  } else {
+    bd = (Math.random() * 0.02 - 0.01);
+    pd = (Math.random() * 0.3 - 0.15);
+  }
+
+  bufNow = Math.max(0.5, Math.min(13.5, bufNow + bd));
+  plainNow = Math.max(0.5, Math.min(13.5, plainNow + pd));
+
+  var bDelta = bufNow - bufBefore;
+  var pDelta = plainNow - plainBefore;
+
+  document.getElementById('buf-before').textContent = bufBefore.toFixed(2);
+  document.getElementById('buf-after').textContent = bufNow.toFixed(2);
+  document.getElementById('plain-before').textContent = plainBefore.toFixed(2);
+  document.getElementById('plain-after').textContent = plainNow.toFixed(2);
+
+  var bdEl = document.getElementById('buf-delta');
+  bdEl.textContent = (bDelta >= 0 ? '+' : '') + bDelta.toFixed(2);
+  bdEl.style.color = Math.abs(bDelta) < 0.1 ? '#3B6D11' : '#854F0B';
+
+  var pdEl = document.getElementById('plain-delta');
+  pdEl.textContent = (pDelta >= 0 ? '+' : '') + pDelta.toFixed(2);
+  pdEl.style.color = Math.abs(pDelta) > 0.5 ? '#A32D2D' : '#854F0B';
+
+  var what = type === 'acid' ? 'asam' : type === 'base' ? 'basa' : 'pengenceran';
+  var ratio = (Math.abs(pDelta) / Math.abs(bDelta)).toFixed(0);
+  document.getElementById('verdict').textContent =
+    'Setelah ditambah ' + what + ': penyangga berubah ' + Math.abs(bDelta).toFixed(2) +
+    ' unit, larutan biasa berubah ' + Math.abs(pDelta).toFixed(2) +
+    ' unit — sekitar ' + ratio + '\u00D7 lebih besar.';
+}
+
+function reset() {
+  bufNow = 7.40; plainNow = 7.00;
+  document.getElementById('buf-before').textContent = '7.40';
+  document.getElementById('buf-after').textContent = '—';
+  document.getElementById('plain-before').textContent = '7.00';
+  document.getElementById('plain-after').textContent = '—';
+  document.getElementById('buf-delta').textContent = '—';
+  document.getElementById('buf-delta').style.color = '#999';
+  document.getElementById('plain-delta').textContent = '—';
+  document.getElementById('plain-delta').style.color = '#999';
+  document.getElementById('verdict').textContent = 'Pilih aksi di atas untuk melihat perubahan pH sebelum dan sesudah.';
+}
+</script>
+</body>
+</html>
